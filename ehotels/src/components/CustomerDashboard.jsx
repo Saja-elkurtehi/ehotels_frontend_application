@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import BookingPopup from './BookingPopup';  // Import the popup component
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {
+  // ... existing state variables
   const [rooms, setRooms] = useState([]);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -14,12 +16,16 @@ const CustomerDashboard = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
+  
+  // State to manage the booking popup
+  const [showBookingPopup, setShowBookingPopup] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
 
   const fetchAvailableRooms = async () => {
+    // ... your existing fetchAvailableRooms code
     setLoading(true);
     setFetchError(null);
     try {
-      // Build the request parameters. Only include filters if they have a value.
       const params = {
         start: checkIn,
         end: checkOut,
@@ -33,7 +39,6 @@ const CustomerDashboard = () => {
       console.log("Searching with params:", params);
 
       const response = await axios.get('http://localhost:8080/api/rooms/available', { params });
-
       console.log("Fetched rooms:", response.data);
       if (Array.isArray(response.data) && response.data.length > 0) {
         setRooms(response.data);
@@ -63,7 +68,6 @@ const CustomerDashboard = () => {
     } catch (error) {
       console.error('Error fetching rooms:', error);
       setFetchError(error.message);
-      // Fallback sample data in case of error
       setRooms([
         {
           roomId: 9993,
@@ -77,6 +81,37 @@ const CustomerDashboard = () => {
       ]);
     }
     setLoading(false);
+  };
+
+  // Function to open the booking popup
+  const openBookingPopup = (roomId) => {
+    setSelectedRoomId(roomId);
+    setShowBookingPopup(true);
+  };
+
+  // Function to handle booking submission from the popup
+  const handleBookingSubmit = async ({ roomId, checkInDate, checkOutDate }) => {
+    setShowBookingPopup(false);
+    const customerId = 1; // Assume logged in customer (replace with actual user info)
+    const bookingDate = new Date().toISOString().substring(0, 10);
+    const bookingData = {
+      status: "Reserved",
+      bookingDate: bookingDate,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate
+    };
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/bookings?customerId=${customerId}&roomId=${roomId}`,
+        bookingData
+      );
+      console.log("Booking response:", response.data);
+      alert("Booking successful! " + response.data);
+    } catch (error) {
+      console.error("Error booking room:", error);
+      alert("Error booking room.");
+    }
   };
 
   return (
@@ -136,7 +171,6 @@ const CustomerDashboard = () => {
           <option value="Downtown">Downtown</option>
           <option value="Suburb">Suburb</option>
           <option value="Airport">Airport</option>
-          {/* Add other area options as needed */}
         </select>
         <label>Price Range</label>
         <div className="price-range">
@@ -178,12 +212,22 @@ const CustomerDashboard = () => {
                 <p><strong>Capacity:</strong> {room.capacity} guests</p>
                 <p><strong>View:</strong> {room.viewType}</p>
                 {room.anyProblems && <p><strong>Note:</strong> {room.anyProblems}</p>}
-                <button>Book now</button>
+                <button onClick={() => openBookingPopup(room.roomId)}>Book now</button>
               </div>
             ))}
           </div>
         )}
       </main>
+
+      {/* Booking Popup */}
+      <BookingPopup
+        show={showBookingPopup}
+        roomId={selectedRoomId}
+        initialCheckIn={checkIn}
+        initialCheckOut={checkOut}
+        onSubmit={handleBookingSubmit}
+        onClose={() => setShowBookingPopup(false)}
+      />
     </div>
   );
 };
