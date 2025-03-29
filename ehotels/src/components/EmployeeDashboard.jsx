@@ -554,7 +554,11 @@ const EmployeeDashboard = () => {
             initialValue={moment()}
             rules={[{ required: true, message: 'Please select booking date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -562,7 +566,11 @@ const EmployeeDashboard = () => {
             label="Check In Date"
             rules={[{ required: true, message: 'Please select check-in date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -570,7 +578,11 @@ const EmployeeDashboard = () => {
             label="Check Out Date"
             rules={[{ required: true, message: 'Please select check-out date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Form>
       </Modal>
@@ -634,7 +646,11 @@ const EmployeeDashboard = () => {
             label="Check In Date"
             rules={[{ required: true, message: 'Please select check-in date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -642,7 +658,11 @@ const EmployeeDashboard = () => {
             label="Expected Check Out Date"
             rules={[{ required: true, message: 'Please select check-out date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -718,7 +738,11 @@ const EmployeeDashboard = () => {
             label="Check In Date"
             rules={[{ required: true, message: 'Please select check-in date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
@@ -726,7 +750,11 @@ const EmployeeDashboard = () => {
             label="Expected Check Out Date"
             rules={[{ required: true, message: 'Please select check-out date' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              format="YYYY-MM-DD"
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item
