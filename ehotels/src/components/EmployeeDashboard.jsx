@@ -405,7 +405,7 @@ const EmployeeDashboard = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Hotel Employee Dashboard</h1>
+      <h1>Employee Dashboard</h1>
       
       {fetchError && (
         <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#FFF0F0', border: '1px solid #FFD6D6', borderRadius: '4px' }}>
