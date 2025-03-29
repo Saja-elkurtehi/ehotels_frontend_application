@@ -7,6 +7,7 @@ const CustomerDashboard = () => {
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
+  const [selectedHotelChain, setSelectedHotelChain] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
 
@@ -16,17 +17,17 @@ const CustomerDashboard = () => {
     try {
       const response = await axios.get('http://localhost:8080/api/rooms/available', {
         params: {
-          start: '2025-05-01',
-          end: '2025-05-10',
-          guests: 2
+          start: checkIn,
+          end: checkOut,
+          guests: guests,
+          ...(selectedHotelChain && { hotelChainId: selectedHotelChain })
         }
-      })
-      
+      });
+
       console.log("Fetched rooms:", response.data);
       if (Array.isArray(response.data) && response.data.length > 0) {
         setRooms(response.data);
       } else {
-        // Fallback sample data if the response is empty
         console.warn("No rooms found. Using fallback sample data.");
         setRooms([
           {
@@ -92,6 +93,18 @@ const CustomerDashboard = () => {
           value={guests}
           onChange={(e) => setGuests(Number(e.target.value))}
         />
+        <label>Hotel Chain</label>
+        <select
+          value={selectedHotelChain}
+          onChange={(e) => setSelectedHotelChain(e.target.value)}
+        >
+          <option value="">All Hotel Chains</option>
+          <option value="1">Hilton</option>
+          <option value="2">Marriott</option>
+          <option value="3">Hyatt</option>
+          <option value="4">InterContinental</option>
+          <option value="5">Accor</option>
+        </select>
         <button onClick={fetchAvailableRooms}>Search</button>
       </aside>
 
@@ -112,7 +125,7 @@ const CustomerDashboard = () => {
             {rooms.map((room, index) => (
               <div key={index} className="room-card">
                 <h3>Room ID: {room.roomId}</h3>
-                <p>Hotel ID: {room.hotelId}</p>
+                <p>Hotel: {room.hotelName}</p>
                 <p><strong>Price:</strong> ${room.price}</p>
                 <p><strong>Capacity:</strong> {room.capacity} guests</p>
                 <p><strong>View:</strong> {room.viewType}</p>
