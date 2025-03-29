@@ -55,164 +55,24 @@ const EmployeeDashboard = () => {
     try {
       // Fetch bookings
       const bookingsRes = await axios.get('/api/bookings');
-      console.log('Bookings data:', bookingsRes.data);
       setBookings(Array.isArray(bookingsRes.data) ? bookingsRes.data : []);
       
       // Fetch customers
       const customersRes = await axios.get('/api/customers');
-      console.log('Customers data:', customersRes.data);
       setCustomers(Array.isArray(customersRes.data) ? customersRes.data : []);
       
       // Fetch rooms
       const roomsRes = await axios.get('/api/rooms');
-      console.log('Rooms data:', roomsRes.data);
       setRooms(Array.isArray(roomsRes.data) ? roomsRes.data : []);
       
       // Fetch rentings
       const rentingsRes = await axios.get('/api/rentings');
-      console.log('Rentings data:', rentingsRes.data);
       setRentings(Array.isArray(rentingsRes.data) ? rentingsRes.data : []);
-      
-      // If we have no data, add some sample data for testing
-      if (bookingsRes.data.length === 0) {
-        setBookings([
-          {
-            bookingId: 1,
-            status: "Reserved",
-            bookingDate: "2025-05-01",
-            checkInDate: "2025-05-10",
-            checkOutDate: "2025-05-12",
-            customerId: 1,
-            roomId: 2833
-          },
-          {
-            bookingId: 2,
-            status: "CheckedIn",
-            bookingDate: "2025-05-02",
-            checkInDate: "2025-05-08",
-            checkOutDate: "2025-05-15",
-            customerId: 1,
-            roomId: 2834
-          }
-        ]);
-      }
-      
-      if (customersRes.data.length === 0) {
-        setCustomers([
-          {
-            customerId: 1,
-            fullName: "John Doe",
-            address: "123 Main St, New York, NY",
-            registrationDate: "2025-01-10",
-            ssn: "111-22-3333"
-          }
-        ]);
-      }
-      
-      if (roomsRes.data.length === 0) {
-        setRooms([
-          {
-            roomId: 2833,
-            hotelId: 1,
-            price: 250,
-            extension: true,
-            capacity: 1,
-            viewType: "sea view",
-            anyProblems: null
-          },
-          {
-            roomId: 2834,
-            hotelId: 1,
-            price: 300,
-            extension: true,
-            capacity: 2,
-            viewType: "mountain view",
-            anyProblems: null
-          }
-        ]);
-      }
-      
-      if (rentingsRes.data.length === 0) {
-        setRentings([
-          {
-            rentingId: 1,
-            checkInDate: "2025-05-10",
-            checkOutDate: "2025-05-12",
-            status: "Active",
-            customerId: 1,
-            roomId: 2833
-          }
-        ]);
-      }
       
     } catch (error) {
       console.error('Error fetching data:', error);
       setFetchError(`Failed to load data: ${error.message}`);
-      message.error('Failed to load data. Using sample data instead.');
-      
-      // Set sample data for testing
-      setBookings([
-        {
-          bookingId: 1,
-          status: "Reserved",
-          bookingDate: "2025-05-01",
-          checkInDate: "2025-05-10",
-          checkOutDate: "2025-05-12",
-          customerId: 1,
-          roomId: 2833
-        },
-        {
-          bookingId: 2,
-          status: "CheckedIn",
-          bookingDate: "2025-05-02",
-          checkInDate: "2025-05-08",
-          checkOutDate: "2025-05-15",
-          customerId: 1,
-          roomId: 2834
-        }
-      ]);
-      
-      setCustomers([
-        {
-          customerId: 1,
-          fullName: "John Doe",
-          address: "123 Main St, New York, NY",
-          registrationDate: "2025-01-10",
-          ssn: "111-22-3333"
-        }
-      ]);
-      
-      setRooms([
-        {
-          roomId: 2833,
-          hotelId: 1,
-          price: 250,
-          extension: true,
-          capacity: 1,
-          viewType: "sea view",
-          anyProblems: null
-        },
-        {
-          roomId: 2834,
-          hotelId: 1,
-          price: 300,
-          extension: true,
-          capacity: 2,
-          viewType: "mountain view",
-          anyProblems: null
-        }
-      ]);
-      
-      setRentings([
-        {
-          rentingId: 1,
-          checkInDate: "2025-05-10",
-          checkOutDate: "2025-05-12",
-          status: "Active",
-          customerId: 1,
-          roomId: 2833
-        }
-      ]);
+      message.error('Failed to load data.');
     }
     
     setLoading(false);
@@ -279,12 +139,15 @@ const EmployeeDashboard = () => {
       key: 'bookingId',
     },
     {
-      title: 'Customer',
-      dataIndex: 'customerId',
-      key: 'customerId',
-      render: (customerId) => {
-        const customer = customers.find(c => c.customerId === customerId);
-        return customer ? customer.fullName : 'N/A';
+      title: 'Hotel',
+      dataIndex: 'roomId',
+      key: 'hotel',
+      render: (roomId) => {
+        const room = rooms.find(r => r.roomId === roomId);
+        if (room) {
+          return `${room.hotelId}`;
+        }
+        return 'N/A';
       }
     },
     {
@@ -293,7 +156,16 @@ const EmployeeDashboard = () => {
       key: 'roomId',
       render: (roomId) => {
         const room = rooms.find(r => r.roomId === roomId);
-        return room ? `Room ${roomId} (${room.viewType})` : 'N/A';
+        return room ? `Room ${roomId}` : 'N/A';
+      }
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customerId',
+      key: 'customerId',
+      render: (customerId) => {
+        const customer = customers.find(c => c.customerId === customerId);
+        return customer ? customer.fullName : 'N/A';
       }
     },
     {
@@ -349,13 +221,21 @@ const EmployeeDashboard = () => {
       key: 'rentingId',
     },
     {
-      title: 'Customer',
-      dataIndex: 'customerId',
-      key: 'customerId',
-      render: (customerId) => {
-        const customer = customers.find(c => c.customerId === customerId);
-        return customer ? customer.fullName : 'N/A';
+      title: 'Hotel',
+      dataIndex: 'roomId',
+      key: 'hotel',
+      render: (roomId) => {
+        const room = rooms.find(r => r.roomId === roomId);
+        if (room) {
+          return `${room.hotelId}`;
+        }
+        return 'N/A';
       }
+    },
+    {
+      title: 'Employee ID',
+      dataIndex: 'employeeId',
+      key: 'employeeId',
     },
     {
       title: 'Room',
@@ -363,7 +243,16 @@ const EmployeeDashboard = () => {
       key: 'roomId',
       render: (roomId) => {
         const room = rooms.find(r => r.roomId === roomId);
-        return room ? `Room ${roomId} (${room.viewType})` : 'N/A';
+        return room ? `Room ${roomId}` : 'N/A';
+      }
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customerId',
+      key: 'customerId',
+      render: (customerId) => {
+        const customer = customers.find(c => c.customerId === customerId);
+        return customer ? customer.fullName : 'N/A';
       }
     },
     {
@@ -410,7 +299,6 @@ const EmployeeDashboard = () => {
       {fetchError && (
         <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#FFF0F0', border: '1px solid #FFD6D6', borderRadius: '4px' }}>
           <p><strong>Note:</strong> {fetchError}</p>
-          <p>Using sample data for demonstration.</p>
         </div>
       )}
       
