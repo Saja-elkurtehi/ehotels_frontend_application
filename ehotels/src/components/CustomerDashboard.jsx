@@ -8,6 +8,10 @@ const CustomerDashboard = () => {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
   const [selectedHotelChain, setSelectedHotelChain] = useState('');
+  const [hotelCategory, setHotelCategory] = useState('');
+  const [area, setArea] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
 
@@ -15,14 +19,20 @@ const CustomerDashboard = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const response = await axios.get('http://localhost:8080/api/rooms/available', {
-        params: {
-          start: checkIn,
-          end: checkOut,
-          guests: guests,
-          ...(selectedHotelChain && { hotelChainId: selectedHotelChain })
-        }
-      });
+      // Build the request parameters. Only include filters if they have a value.
+      const params = {
+        start: checkIn,
+        end: checkOut,
+        guests: guests,
+        ...(selectedHotelChain && { hotelChainId: selectedHotelChain }),
+        ...(hotelCategory && { hotelCategory }),
+        ...(area && { area }),
+        ...(minPrice && maxPrice && { minPrice, maxPrice })
+      };
+
+      console.log("Searching with params:", params);
+
+      const response = await axios.get('http://localhost:8080/api/rooms/available', { params });
 
       console.log("Fetched rooms:", response.data);
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -105,6 +115,44 @@ const CustomerDashboard = () => {
           <option value="4">InterContinental</option>
           <option value="5">Accor</option>
         </select>
+        <label>Hotel Category</label>
+        <select
+          value={hotelCategory}
+          onChange={(e) => setHotelCategory(e.target.value)}
+        >
+          <option value="">Any</option>
+          <option value="1">1 Star</option>
+          <option value="2">2 Stars</option>
+          <option value="3">3 Stars</option>
+          <option value="4">4 Stars</option>
+          <option value="5">5 Stars</option>
+        </select>
+        <label>Area</label>
+        <select
+          value={area}
+          onChange={(e) => setArea(e.target.value)}
+        >
+          <option value="">Any</option>
+          <option value="Downtown">Downtown</option>
+          <option value="Suburb">Suburb</option>
+          <option value="Airport">Airport</option>
+          {/* Add other area options as needed */}
+        </select>
+        <label>Price Range</label>
+        <div className="price-range">
+          <input 
+            type="number" 
+            placeholder="Min Price" 
+            value={minPrice} 
+            onChange={(e) => setMinPrice(e.target.value)} 
+          />
+          <input 
+            type="number" 
+            placeholder="Max Price" 
+            value={maxPrice} 
+            onChange={(e) => setMaxPrice(e.target.value)} 
+          />
+        </div>
         <button onClick={fetchAvailableRooms}>Search</button>
       </aside>
 
@@ -125,7 +173,7 @@ const CustomerDashboard = () => {
             {rooms.map((room, index) => (
               <div key={index} className="room-card">
                 <h3>Room ID: {room.roomId}</h3>
-                <p>Hotel: {room.hotelName}</p>
+                <p>Hotel: {room.hotelName || room.hotelId}</p>
                 <p><strong>Price:</strong> ${room.price}</p>
                 <p><strong>Capacity:</strong> {room.capacity} guests</p>
                 <p><strong>View:</strong> {room.viewType}</p>
