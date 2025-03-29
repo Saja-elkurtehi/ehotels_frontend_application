@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Modal, Form, Input, DatePicker, Select, Card, Tabs, message, Tag, Button, Space, InputNumber, Radio } from 'antd';
+import { Table, Modal, Form, Input, DatePicker, Select, Card, Tabs, message, Tag, Button, Space, InputNumber, Radio, Row, Col, Statistic, Progress, Pie } from 'antd';
 import moment from 'moment';
 
 const { TabPane } = Tabs;
@@ -15,6 +15,8 @@ const EmployeeDashboard = () => {
   const [rooms, setRooms] = useState([]);
   const [rentings, setRentings] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [availableRooms, setAvailableRooms] = useState([]);
+  const [roomCapacity, setRoomCapacity] = useState([]);
   
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -65,6 +67,17 @@ const EmployeeDashboard = () => {
       } catch (error) {
         console.warn('Could not fetch employees, using default ID of 1');
         setEmployees([{ employeeId: 1, name: 'Current Employee' }]);
+      }
+      
+      // Fetch the new view data
+      try {
+        const availableRoomsRes = await axios.get('/api/views/available-rooms');
+        setAvailableRooms(Array.isArray(availableRoomsRes.data) ? availableRoomsRes.data : []);
+        
+        const roomCapacityRes = await axios.get('/api/views/room-capacity');
+        setRoomCapacity(Array.isArray(roomCapacityRes.data) ? roomCapacityRes.data : []);
+      } catch (error) {
+        console.warn('Could not fetch view data:', error);
       }
       
     } catch (error) {
@@ -287,7 +300,7 @@ const EmployeeDashboard = () => {
       key: 'bookingId',
     },
     {
-      title: 'Hotel',
+      title: 'Hotel ID',
       dataIndex: 'roomId',
       key: 'hotel',
       render: (roomId) => {
@@ -299,7 +312,7 @@ const EmployeeDashboard = () => {
       }
     },
     {
-      title: 'Room',
+      title: 'Room #',
       dataIndex: 'roomId',
       key: 'roomId',
       render: (roomId) => {
@@ -333,6 +346,24 @@ const EmployeeDashboard = () => {
       dataIndex: 'checkOutDate',
       key: 'checkOutDate',
       render: (date) => moment(date).format('MMM DD, YYYY')
+    },
+    {
+      title: 'Price/Night',
+      dataIndex: 'roomId',
+      key: 'price',
+      render: (roomId) => {
+        const room = rooms.find(r => r.roomId === roomId);
+        return room ? `$${room.price}` : 'N/A';
+      }
+    },
+    {
+      title: 'Total Cost',
+      key: 'total',
+      render: (_, record) => {
+        const days = moment(record.checkOutDate).diff(record.checkInDate, 'days');
+        const room = rooms.find(r => r.roomId === record.roomId);
+        return room ? `$${days * room.price}` : 'N/A';
+      }
     },
     {
       title: 'Status',
@@ -373,7 +404,7 @@ const EmployeeDashboard = () => {
       key: 'rentingId',
     },
     {
-      title: 'Hotel',
+      title: 'Hotel ID',
       dataIndex: 'roomId',
       key: 'hotel',
       render: (roomId) => {
@@ -445,6 +476,20 @@ const EmployeeDashboard = () => {
     }
   ];
 
+  // Columns for the available rooms per area view
+  const availableRoomsColumns = [
+    {
+      title: 'Hotel Address/Area',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: 'Available Rooms',
+      dataIndex: 'available_rooms',
+      key: 'available_rooms',
+    },
+  ];
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Employee Dashboard</h1>
@@ -492,6 +537,91 @@ const EmployeeDashboard = () => {
               pagination={{ pageSize: 8 }}
             />
           </Card>
+        </TabPane>
+        
+        <TabPane tab="Room Availability" key="3">
+          <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
+            <Col span={24}>
+              <Card title="Available Rooms by Area">
+                <Row gutter={[16, 16]}>
+                  {availableRooms.map((area, index) => (
+                    <Col span={8} key={index}>
+                      <Card>
+                        <Statistic
+                          title={`Available at ${area.address}`}
+                          value={area.available_rooms}
+                          suffix="rooms"
+                        />
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+        </TabPane>
+        
+        <TabPane tab="Dashboard Overview" key="5">
+          <Row gutter={[16, 16]}>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Total Bookings"
+                  value={bookings.length}
+                  valueStyle={{ color: '#3f8600' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Active Rentings"
+                  value={rentings.filter(r => r.status === 'Active').length}
+                  valueStyle={{ color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Total Available Rooms"
+                  value={availableRooms.reduce((acc, curr) => acc + curr.available_rooms, 0)}
+                  valueStyle={{ color: '#722ed1' }}
+                />
+              </Card>
+            </Col>
+          </Row>
+          
+          <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
+            <Col span={12}>
+              <Card title="Available Rooms by Area Summary">
+                <Table 
+                  dataSource={availableRooms} 
+                  columns={[
+                    { title: 'Area', dataIndex: 'address', key: 'address' },
+                    { title: 'Available', dataIndex: 'available_rooms', key: 'available' }
+                  ]} 
+                  rowKey="address" 
+                  pagination={false}
+                  size="small"
+                />
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card title="Hotel Capacity Summary">
+                <Table 
+                  dataSource={roomCapacity} 
+                  columns={[
+                    { title: 'Hotel ID', dataIndex: 'hotel_id', key: 'hotel_id' },
+                    { title: 'Capacity', dataIndex: 'total_capacity', key: 'capacity' }
+                  ]} 
+                  rowKey="hotel_id" 
+                  pagination={false}
+                  size="small"
+                />
+              </Card>
+            </Col>
+          </Row>
         </TabPane>
       </Tabs>
 
