@@ -23,7 +23,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="header">
-          <h1>Welcome Back</h1>
+          <h1>Welcome!</h1>
           <p>Please login to your account</p>
         </div>
 
@@ -58,7 +58,7 @@ const Login = () => {
             Sign In <i className="fas fa-arrow-right"></i>
           </button>
         </form>
-        <p className="signup-link">Don't have an account? <a href="/signup">Create account</a></p>
+        <p className="signup-link">Don't have an account? <a href="/">Create account</a></p>
       </div>
     </div>
   );

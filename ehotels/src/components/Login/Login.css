@@ -23,6 +23,11 @@ body {
 }
 
 .login-container {
+    width: 500px !important;
+    max-width: 450px !important;
+}
+
+.login-container {
     position: relative;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
