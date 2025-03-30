@@ -448,9 +448,6 @@ const EmployeeDashboard = () => {
               Check In
             </Button>
           )}
-          <Button size="small" type="default" onClick={() => handleUpdateBooking(record)}>
-            Edit
-          </Button>
           <Button size="small" danger onClick={() => handleDeleteBooking(record.bookingId)}>
             Delete
           </Button>
@@ -660,8 +657,9 @@ const EmployeeDashboard = () => {
                 <Table 
                   dataSource={availableRooms} 
                   columns={[
-                    { title: 'Area', dataIndex: 'address', key: 'address' },
-                    { title: 'Available', dataIndex: 'available_rooms', key: 'available' }
+                    { title: 'Hotel ID', dataIndex: 'hotel_id', key: 'hotel_id' },
+                    { title: 'Address', dataIndex: 'address', key: 'address' },
+                    { title: 'Available Rooms', dataIndex: 'available_rooms', key: 'available' }
                   ]} 
                   rowKey="address" 
                   pagination={false}
