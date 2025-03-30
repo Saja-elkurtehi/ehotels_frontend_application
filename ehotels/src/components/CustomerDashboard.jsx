@@ -16,6 +16,7 @@ const CustomerDashboard = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
+  axios.defaults.baseURL = 'http://localhost:8080/';
   
   // State to manage the booking popup
   const [showBookingPopup, setShowBookingPopup] = useState(false);
@@ -38,7 +39,7 @@ const CustomerDashboard = () => {
 
       console.log("Searching with params:", params);
 
-      const response = await axios.get('http://localhost:8080/api/rooms/available', { params });
+      const response = await axios.get('/api/rooms/available', { params });
       console.log("Fetched rooms:", response.data);
       if (Array.isArray(response.data) && response.data.length > 0) {
         setRooms(response.data);
@@ -103,9 +104,10 @@ const CustomerDashboard = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/bookings?customerId=${customerId}&roomId=${roomId}`,
+        `http://localhost:8080/api/bookings/with-params?customerId=${customerId}&roomId=${roomId}`,
         bookingData
       );
+      
       console.log("Booking response:", response.data);
       alert("Booking successful! " + response.data);
     } catch (error) {
