@@ -34,6 +34,8 @@ const EmployeeDashboard = () => {
   const [directRentingForm] = Form.useForm();
   const [paymentForm] = Form.useForm();
 
+  const [isNewCustomer, setIsNewCustomer] = useState(false);
+
   // Fetch data on component mount
   useEffect(() => {
     fetchData();
@@ -101,9 +103,39 @@ const EmployeeDashboard = () => {
       const values = await bookingForm.validateFields();
       setSubmitLoading(true);
       
+      let customerId = values.customerId;
+      
+      // If creating a new customer, create it first and get the ID
+      if (isNewCustomer) {
+        const customerData = {
+          fullName: values.customerName,
+          address: values.customerAddress,
+          ssn: values.customerSSN,
+          registrationDate: moment().format('YYYY-MM-DD')
+        };
+        
+        // Create the customer and get the ID
+        const response = await axios.post('/api/customers', customerData);
+        
+        // If your API returns the created customer with ID, use that
+        // Otherwise, you might need to fetch the newly created customer
+        const newCustomersResponse = await axios.get('/api/customers');
+        const newCustomers = Array.isArray(newCustomersResponse.data) ? newCustomersResponse.data : [];
+        
+        // Find the customer by matching the SSN or name (depending on your API)
+        const newCustomer = newCustomers.find(c => 
+          c.fullName === customerData.fullName && c.ssn === customerData.ssn);
+        
+        if (newCustomer) {
+          customerId = newCustomer.customerId;
+        } else {
+          throw new Error('Failed to create new customer');
+        }
+      }
+      
       // Format dates for API
       const bookingData = {
-        customerId: values.customerId,
+        customerId: customerId,
         roomId: values.roomId,
         status: values.status || 'Reserved', // Default status
         bookingDate: values.bookingDate.format('YYYY-MM-DD'),
@@ -111,7 +143,7 @@ const EmployeeDashboard = () => {
         checkOutDate: values.checkOutDate.format('YYYY-MM-DD')
       };
       
-      // Submit to API
+      // Submit booking to API
       await axios.post('/api/bookings', bookingData);
       
       message.success('Booking added successfully');
@@ -630,26 +662,71 @@ const EmployeeDashboard = () => {
         title="Add New Booking"
         visible={isBookingModalVisible}
         onOk={handleAddBooking}
-        onCancel={() => setIsBookingModalVisible(false)}
+        onCancel={() => {
+          setIsBookingModalVisible(false);
+          setIsNewCustomer(false);
+        }}
         confirmLoading={submitLoading}
       >
         <Form
           form={bookingForm}
           layout="vertical"
         >
-          <Form.Item
-            name="customerId"
-            label="Customer"
-            rules={[{ required: true, message: 'Please select a customer' }]}
-          >
-            <Select placeholder="Select a customer">
-              {customers.map(customer => (
-                <Option key={customer.customerId} value={customer.customerId}>
-                  {customer.fullName}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
+          {/* Customer Selection or Creation */}
+          <div style={{ marginBottom: 16 }}>
+            <Radio.Group 
+              value={isNewCustomer ? 'new' : 'existing'} 
+              onChange={e => setIsNewCustomer(e.target.value === 'new')}
+              buttonStyle="solid"
+            >
+              <Radio.Button value="existing">Select Existing Customer</Radio.Button>
+              <Radio.Button value="new">Create New Customer</Radio.Button>
+            </Radio.Group>
+          </div>
+
+          {isNewCustomer ? (
+            // New Customer Form
+            <>
+              <Form.Item
+                name="customerName"
+                label="Customer Name"
+                rules={[{ required: true, message: 'Please enter customer name' }]}
+              >
+                <Input placeholder="Full Name" />
+              </Form.Item>
+
+              <Form.Item
+                name="customerSSN"
+                label="SSN"
+                rules={[{ required: true, message: 'Please enter SSN' }]}
+              >
+                <Input placeholder="SSN" />
+              </Form.Item>
+
+              <Form.Item
+                name="customerAddress"
+                label="Address"
+                rules={[{ required: true, message: 'Please enter address' }]}
+              >
+                <Input.TextArea rows={2} placeholder="Customer Address" />
+              </Form.Item>
+            </>
+          ) : (
+            // Existing Customer Selection
+            <Form.Item
+              name="customerId"
+              label="Customer"
+              rules={[{ required: !isNewCustomer, message: 'Please select a customer' }]}
+            >
+              <Select placeholder="Select a customer">
+                {customers.map(customer => (
+                  <Option key={customer.customerId} value={customer.customerId}>
+                    {customer.fullName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="roomId"
