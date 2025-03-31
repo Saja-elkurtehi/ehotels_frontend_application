@@ -105,6 +105,7 @@ const EmployeeDashboard = () => {
       const values = await bookingForm.validateFields();
       setSubmitLoading(true);
   
+  
       let customerId = values.customerId;
   
       // If creating a new customer, create it first and get the ID
@@ -158,9 +159,16 @@ const EmployeeDashboard = () => {
         : [];
       if (existingBookings.length > 0) {
         // Display error popup if there is an overlap
+        setIsBookingModalVisible(false);
+
         Modal.error({
           title: 'Booking Conflict',
-          content: `Room ${values.roomId} is already booked for the selected dates.`,
+          content: (
+            <div style={{ fontSize: '16px', color: 'red', textAlign: 'center' }}>
+              Room {values.roomId} is already booked for the selected dates.
+            </div>
+          ),
+          zIndex: 2000, // ensure this is higher than your booking modal's z-index
           onOk: () => {
             setSubmitLoading(false);
           }
@@ -183,6 +191,7 @@ const EmployeeDashboard = () => {
       setSubmitLoading(false);
     }
   };
+  
   
   
 

@@ -1,102 +1,242 @@
+/* Global Styles */
 
-  /* Main layout */
-  .dashboard {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-  }
-  
-  /* Sidebar */
-  .sidebar {
-    width: 300px;
-    padding: 2rem;
-    background-color: #ffffff;
-    border-right: 1px solid #ddd;
-    box-sizing: border-box;
-  }
-  
-  .sidebar h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .sidebar label {
-    display: block;
-    font-weight: 600;
-    margin: 1rem 0 0.5rem;
-  }
-  
-  .sidebar input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .sidebar button {
-    margin-top: 1.5rem;
-    padding: 0.6rem;
-    width: 100%;
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .sidebar button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Main content */
-  .results {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-  
-  .results h2 {
-    font-size: 1.75rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .room-card {
-    background-color: #fff;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .room-card h3 {
-    margin: 0;
-    font-size: 1.25rem;
-  }
-  
-  .room-card p {
-    margin: 0.3rem 0;
-  }
-  
-  .room-card button {
-    margin-top: 1rem;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .room-card button:hover {
-    background-color: #218838;
-  }
-  
-  .no-results {
-    color: #666;
-    font-style: italic;
-  }
-  
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 2rem;
+}
+
+.navbar-left .customer-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.navbar-right button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 1rem;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+
+.navbar-right button:hover {
+  text-decoration: underline;
+}
+
+/* Customer Dashboard Content */
+.customer-dashboard .content {
+  padding: 2rem;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  display: flex;
+  height: calc(100vh - 68px); /* Adjusting height to account for navbar */
+  width: 100vw;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  height: fit-content;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar label {
+  display: block;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+
+.sidebar input,
+.sidebar select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+/* Sidebar Button */
+.sidebar button {
+  margin-top: 1.5rem;
+  padding: 0.6rem;
+  width: 100%;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background-color: #0056b3;
+}
+
+/* Main Content */
+.results {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.results h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Room Card */
+.room-card {
+  background-color: #fff;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.room-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.room-card p {
+  margin: 0.3rem 0;
+}
+
+/* Room Card Button */
+.room-card button {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.room-card button:hover {
+  background-color: #0056b3;
+}
+
+.no-results {
+  color: #666;
+  font-style: italic;
+}
+/* Styling for the room details in the booking popup */
+.room-details {
+  background-color: #f8f9fa;  /* Light background to contrast with the popup */
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.room-details p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.room-details p strong {
+  color: #000;
+}
+
+
+/* Booking Popup */
+.booking-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.booking-popup {
+  background-color: #fff;
+  padding: 1.25rem;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.booking-popup h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+.booking-popup form {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-popup label {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.booking-popup input {
+  padding: 0.5rem;
+  margin-top: 0.3125rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Popup Buttons */
+.popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+.popup-buttons button {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.popup-buttons button:last-child {
+  margin-right: 0;
+}
+
+/* Confirm Button */
+.popup-buttons button.confirm {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.popup-buttons button.confirm:hover {
+  background-color: #218838;
+}
+
+/* Cancel Button */
+.popup-buttons button.cancel {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.popup-buttons button.cancel:hover {
+  background-color: #c82333;
+}
