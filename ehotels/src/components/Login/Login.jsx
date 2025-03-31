@@ -11,9 +11,9 @@ const Login = () => {
     e.preventDefault();
     
     if (username === 'employee' && password === 'employee') {
-      navigate('/employee-dashboard');
+      navigate('/employee-dashboard/1');
     } else if (username === 'customer' && password === 'customer') {
-      navigate('/customer-dashboard');
+      navigate('/customer-dashboard/1');
     } else {
       alert('Invalid credentials! Use "employee" or "customer" for both fields');
     }
@@ -58,7 +58,7 @@ const Login = () => {
             Sign In <i className="fas fa-arrow-right"></i>
           </button>
         </form>
-        <p className="signup-link">Don't have an account? <a href="/">Create account</a></p>
+        <p className="signup-link">Don't have an account? <a href="/register">Create account</a></p>
       </div>
     </div>
   );
