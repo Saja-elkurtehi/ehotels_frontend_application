@@ -1,0 +1,92 @@
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #4cc9f0;
+    --background: linear-gradient(45deg, #f8f9fa 0%, #e9ecef 100%);
+    --text-dark: #2b2d42;
+    --text-light: #8d99ae;
+}
+
+body {
+    background: var(--background);
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container styling */
+.registration-container {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 150%;
+    max-width: 500px;
+    margin: 50px auto;
+    transition: transform 0.3s ease;
+}
+
+
+.registration-container:hover {
+    transform: translateY(-5px);
+}
+
+/* Header styling */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    color: var(--text-dark);
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Ant Design label overrides */
+.ant-form-item-label > label {
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Registration button */
+.registration-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.registration-btn:hover {
+    background: linear-gradient(45deg, #3a52d1, #3fb4d8);
+    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .registration-container {
+        padding: 30px;
+    }
+    
+    .header h1 {
+        font-size: 1.75rem;
+    }
+}

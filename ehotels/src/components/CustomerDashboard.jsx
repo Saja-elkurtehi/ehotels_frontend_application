@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BookingPopup from './BookingPopup';  // Import the popup component
 import './CustomerDashboard.css';
+
 
 const CustomerDashboard = () => {
   // ... existing state variables
@@ -22,6 +23,21 @@ const CustomerDashboard = () => {
   const [showBookingPopup, setShowBookingPopup] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
+  const fetchAllRooms = async () => {
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const response = await axios.get('/api/rooms');
+      console.log("Fetched all rooms:", response.data);
+      setRooms(response.data);
+    } catch (error) {
+      console.error("Error fetching all rooms:", error);
+      setFetchError(error.message);
+      // Optionally, set fallback data if needed:
+      setRooms([]);
+    }
+    setLoading(false);
+  };
   const fetchAvailableRooms = async () => {
     // ... your existing fetchAvailableRooms code
     setLoading(true);
@@ -83,6 +99,9 @@ const CustomerDashboard = () => {
     }
     setLoading(false);
   };
+  useEffect(() => {
+    fetchAllRooms();
+  }, []);
 
   // Function to open the booking popup
   const openBookingPopup = (roomId) => {
@@ -115,6 +134,7 @@ const CustomerDashboard = () => {
       alert("Error booking room.");
     }
   };
+  
 
   return (
     <div className="dashboard">

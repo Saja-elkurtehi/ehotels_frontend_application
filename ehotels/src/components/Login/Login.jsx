@@ -58,7 +58,7 @@ const Login = () => {
             Sign In <i className="fas fa-arrow-right"></i>
           </button>
         </form>
-        <p className="signup-link">Don't have an account? <a href="/">Create account</a></p>
+        <p className="signup-link">Don't have an account? <a href="/register">Create account</a></p>
       </div>
     </div>
   );
