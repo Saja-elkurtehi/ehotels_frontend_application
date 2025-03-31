@@ -104,9 +104,9 @@ const EmployeeDashboard = () => {
     try {
       const values = await bookingForm.validateFields();
       setSubmitLoading(true);
-      
+  
       let customerId = values.customerId;
-      
+  
       // If creating a new customer, create it first and get the ID
       if (isNewCustomer) {
         const customerData = {
@@ -115,71 +115,76 @@ const EmployeeDashboard = () => {
           ssn: values.customerSSN,
           registrationDate: moment().format('YYYY-MM-DD')
         };
-        
+  
         // Create the customer and get the ID
-        const response = await axios.post('/api/customers', customerData);
-        
-        // If your API returns the created customer with ID, use that
-        // Otherwise, you might need to fetch the newly created customer
+        await axios.post('/api/customers', customerData);
+  
+        // Re-fetch customers and find the newly created one
         const newCustomersResponse = await axios.get('/api/customers');
-        const newCustomers = Array.isArray(newCustomersResponse.data) ? newCustomersResponse.data : [];
-        
-        // Find the customer by matching the SSN or name (depending on your API)
-        const newCustomer = newCustomers.find(c => 
-          c.fullName === customerData.fullName && c.ssn === customerData.ssn);
-        
+        const newCustomers = Array.isArray(newCustomersResponse.data)
+          ? newCustomersResponse.data
+          : [];
+        const newCustomer = newCustomers.find(
+          c => c.fullName === customerData.fullName && c.ssn === customerData.ssn
+        );
+  
         if (newCustomer) {
           customerId = newCustomer.customerId;
         } else {
           throw new Error('Failed to create new customer');
         }
       }
-      
+  
       // Format dates for API
       const bookingData = {
         customerId: customerId,
         roomId: values.roomId,
-        status: values.status || 'Reserved', // Default status
+        status: values.status || 'Reserved',
         bookingDate: values.bookingDate.format('YYYY-MM-DD'),
         checkInDate: values.checkInDate.format('YYYY-MM-DD'),
         checkOutDate: values.checkOutDate.format('YYYY-MM-DD')
       };
-      
-      // Submit booking to API
-      await axios.post('/api/bookings', bookingData);
-      
-      // only close modal on success
-      message.success('Booking added successfully');
-      setIsBookingModalVisible(false);
-      fetchData(); // Refresh the data
-
-    } catch (error) {
-      console.error('Booking:', error);
-
-      // handle booking conflicts
-      if (error.response?.data?.error === 'booking_conflict') {
-        setBookingError({
-          title: "Room Unavailable",
-          message: "This room is already booked for your selected dates",
-          roomId: error.response.data.roomId,
-          conflictDates: {
-            checkIn: error.response.data.conflictingDates?.checkIn,
-            checkOut: error.response.data.conflictingDates?.checkOut
+  
+      // Call the new overlap-check endpoint to verify if the date range conflicts
+      const existingBookingsResponse = await axios.get('/api/bookings/overlap-check', {
+        params: {
+          roomId: values.roomId,
+          checkInDate: values.checkInDate.format('YYYY-MM-DD'),
+          checkOutDate: values.checkOutDate.format('YYYY-MM-DD')
+        }
+      });
+      const existingBookings = Array.isArray(existingBookingsResponse.data)
+        ? existingBookingsResponse.data
+        : [];
+      if (existingBookings.length > 0) {
+        // Display error popup if there is an overlap
+        Modal.error({
+          title: 'Booking Conflict',
+          content: `Room ${values.roomId} is already booked for the selected dates.`,
+          onOk: () => {
+            setSubmitLoading(false);
           }
         });
-      } 
-      // Handle customer creation errors
-      else if (error.config?.url.includes('/api/customers')) {
-        message.error('Failed to create customer: ' + (error.response?.data?.message || error.message));
+        return;
       }
-      // General errors
-      else {
-        message.error('Failed to add booking: ' + (error.response?.data?.message || error.message));
-      }
+  
+      // No conflict found; proceed to create the booking
+      await axios.post('/api/bookings', bookingData);
+  
+      message.success('Booking added successfully');
+      setIsBookingModalVisible(false);
+      fetchData(); // Refresh data
+    } catch (error) {
+      console.error('Error adding booking:', error);
+      const errorMsg =
+        error.response?.data?.message || error.response?.data || error.message;
+      message.error('Failed to add booking: ' + errorMsg);
     } finally {
       setSubmitLoading(false);
     }
   };
+  
+  
 
   // Show check-in modal to convert a booking to renting
   const showCheckInModal = (booking) => {
