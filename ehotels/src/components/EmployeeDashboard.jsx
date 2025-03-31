@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Modal, Form, Input, DatePicker, Select, Card, Tabs, message, Tag, Button, Space, InputNumber, Radio, Row, Col, Statistic, Progress, Pie } from 'antd';
+import { Table, Modal, Form, Input, DatePicker, Select, Card, Tabs, message, Tag, Button, Space, InputNumber, Radio, Row, Col, Statistic, Progress, Pie, Alert } from 'antd';
 import moment from 'moment';
+import { CalendarOutlined } from '@ant-design/icons';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -21,6 +22,7 @@ const EmployeeDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
+  const [bookingError, setBookingError] = useState(null);
 
   const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
   const [isCheckInModalVisible, setIsCheckInModalVisible] = useState(false);
@@ -146,12 +148,34 @@ const EmployeeDashboard = () => {
       // Submit booking to API
       await axios.post('/api/bookings', bookingData);
       
+      // only close modal on success
       message.success('Booking added successfully');
       setIsBookingModalVisible(false);
       fetchData(); // Refresh the data
+
     } catch (error) {
-      console.error('Error adding booking:', error);
-      message.error('Failed to add booking: ' + (error.response?.data || error.message));
+      console.error('Booking:', error);
+
+      // handle booking conflicts
+      if (error.response?.data?.error === 'booking_conflict') {
+        setBookingError({
+          title: "Room Unavailable",
+          message: "This room is already booked for your selected dates",
+          roomId: error.response.data.roomId,
+          conflictDates: {
+            checkIn: error.response.data.conflictingDates?.checkIn,
+            checkOut: error.response.data.conflictingDates?.checkOut
+          }
+        });
+      } 
+      // Handle customer creation errors
+      else if (error.config?.url.includes('/api/customers')) {
+        message.error('Failed to create customer: ' + (error.response?.data?.message || error.message));
+      }
+      // General errors
+      else {
+        message.error('Failed to add booking: ' + (error.response?.data?.message || error.message));
+      }
     } finally {
       setSubmitLoading(false);
     }
@@ -693,9 +717,39 @@ const EmployeeDashboard = () => {
         onCancel={() => {
           setIsBookingModalVisible(false);
           setIsNewCustomer(false);
+          setBookingError(null);
         }}
         confirmLoading={submitLoading}
+        okButtonProps={{ disabled: submitLoading }}
+        width={800}
       >
+        {/* Error Alert - Add this at the top of modal content */}
+        {bookingError && (
+          <Alert
+            type="error"
+            message={bookingError.title}
+            description={
+              <>
+                <p>{bookingError.message}</p>
+                {bookingError.roomId && (
+                  <p><strong>Room #{bookingError.roomId}</strong></p>
+                )}
+                {bookingError.conflictDates && (
+            <p style={{ color: '#ff4d4f', marginTop: 8 }}>
+              <CalendarOutlined /> Conflicting dates: {bookingError.conflictDates.checkIn} to {bookingError.conflictDates.checkOut}
+            </p>
+          )}
+        </>
+      }
+      showIcon
+      closable
+      onClose={() => setBookingError(null)}
+      style={{ 
+        marginBottom: 24,
+        //animation: 'fadeIn 0.3s' // Optional: Add CSS animation
+      }}
+    />
+        )}
         <Form
           form={bookingForm}
           layout="vertical"
