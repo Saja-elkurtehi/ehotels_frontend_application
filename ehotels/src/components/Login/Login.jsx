@@ -11,9 +11,9 @@ const Login = () => {
     e.preventDefault();
     
     if (username === 'employee' && password === 'employee') {
-      navigate('/employee-dashboard');
+      navigate('/employee-dashboard/1');
     } else if (username === 'customer' && password === 'customer') {
-      navigate('/customer-dashboard');
+      navigate('/customer-dashboard/1');
     } else {
       alert('Invalid credentials! Use "employee" or "customer" for both fields');
     }
